@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile
+#      dockerfile: DockerJenkinsfile
+    container_name: 'jenkins_docker'
+    restart: always
+    user: root
+    ports:
+      - '8082:8080'
+    volumes:
+#      - 'D:\GitHub\jenkins\practice\key:/key'
+#      - 'D:\GitHub\jenkins.jenkins:/var/jenkins_home'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+#      - 'C:\Users\bumil\Desktop\docker\jenkins\practice\key:/key'
+#      - 'C:\Users\bumil\Desktop\docker\jenkins.jenkins:/var/jenkins_home'

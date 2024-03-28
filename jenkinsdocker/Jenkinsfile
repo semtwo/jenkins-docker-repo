@@ -1,0 +1,42 @@
+pipeline {
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  environment {
+    DOCKERHUB_CREDENTIALS = credentials('docker')
+    repository = "semtwo/jenkinstest"
+    dockerImage = ''
+  }
+  stages {
+    stage('Gradle Build') {
+      steps {
+        sh 'chmod +x gradlew'
+        sh './gradlew clean build'
+      }
+    }
+    stage('Docker Build') {
+      steps {
+      echo 'Build Docker image...'
+        script {
+            dockerImage = docker.build repository + ":1.0.0"
+        }
+      }
+    }
+    stage('Login') {
+      steps {
+        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+      }
+    }
+    stage('Push') {
+      steps {
+        sh 'docker push $repository:$BUILD_NUMBER'
+      }
+    }
+  }
+  post {
+    always {
+      sh 'docker logout'
+    }
+  }
+}
